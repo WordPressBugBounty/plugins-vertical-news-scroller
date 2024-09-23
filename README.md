@@ -1,0 +1,1 @@
+# plugins-vertical-news-scroller
