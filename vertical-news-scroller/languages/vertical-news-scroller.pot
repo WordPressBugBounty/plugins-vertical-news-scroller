@@ -1,0 +1,294 @@
+# Copyright (C) 2021 Vertical News Scroller
+# This file is distributed under the same license as the Vertical News Scroller package.
+msgid ""
+msgstr ""
+"Project-Id-Version: Vertical News Scroller 1.20\n"
+"Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/vertical-news-"
+"scroller\n"
+"POT-Creation-Date: 2021-03-25 15:31:26+00:00\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"PO-Revision-Date: 2021-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+
+#: newsScroller.php:300
+msgid "Scroll news"
+msgstr ""
+
+#: newsScroller.php:300
+msgid "Manage Scrolling News"
+msgstr ""
+
+#: newsScroller.php:345
+msgid "Access Denied"
+msgstr ""
+
+#: newsScroller.php:370 newsScroller.php:686
+msgid "UPGRADE TO PRO VERSION"
+msgstr ""
+
+#: newsScroller.php:402
+msgid "News"
+msgstr ""
+
+#: newsScroller.php:402
+msgid "Add New"
+msgstr ""
+
+#: newsScroller.php:410 newsScroller.php:605
+msgid "Bulk Actions"
+msgstr ""
+
+#: newsScroller.php:411 newsScroller.php:527 newsScroller.php:576
+#: newsScroller.php:606
+msgid "Delete"
+msgstr ""
+
+#: newsScroller.php:413 newsScroller.php:609
+msgid "Apply"
+msgstr ""
+
+#: newsScroller.php:479 newsScroller.php:481
+msgid "Search"
+msgstr ""
+
+#: newsScroller.php:482
+msgid "Reset Search"
+msgstr ""
+
+#: newsScroller.php:509 newsScroller.php:512 newsScroller.php:514
+msgid "Title"
+msgstr ""
+
+#: newsScroller.php:518 newsScroller.php:521 newsScroller.php:523
+#: newsScroller.php:574
+msgid "Published On"
+msgstr ""
+
+#: newsScroller.php:526 newsScroller.php:575
+msgid "Edit"
+msgstr ""
+
+#: newsScroller.php:572
+msgid "Select Record"
+msgstr ""
+
+#: newsScroller.php:573
+msgid "Name"
+msgstr ""
+
+#: newsScroller.php:585
+msgid "No Record"
+msgstr ""
+
+#: newsScroller.php:585
+msgid "No News Found"
+msgstr ""
+
+#: newsScroller.php:613
+msgid ""
+"To print this news scroller either you can use theme widget feature or use "
+"below shortcode"
+msgstr ""
+
+#: newsScroller.php:614
+msgid "JQuery Scroller"
+msgstr ""
+
+#: newsScroller.php:617
+msgid "Use"
+msgstr ""
+
+#: newsScroller.php:617
+msgid "If you find problem with v1"
+msgstr ""
+
+#: newsScroller.php:620
+msgid "Marquee Scroller"
+msgstr ""
+
+#: newsScroller.php:626
+msgid "Are you sure you want to delete this news ?"
+msgstr ""
+
+#: newsScroller.php:640
+msgid "Are you sure you want to delete selected news?"
+msgstr ""
+
+#: newsScroller.php:656 newsScroller.php:996
+msgid "Access All Themes One price"
+msgstr ""
+
+#: newsScroller.php:666 newsScroller.php:1006
+msgid "Google For Business Coupon"
+msgstr ""
+
+#: newsScroller.php:705 newsScroller.php:780 newsScroller.php:880
+#: newsScroller.php:913 newsScroller.php:1044 newsScroller.php:1099
+msgid "Access Denied. Please contact your administrator"
+msgstr ""
+
+#: newsScroller.php:829
+msgid "New news added successfully."
+msgstr ""
+
+#: newsScroller.php:837
+msgid "Error while adding news."
+msgstr ""
+
+#: newsScroller.php:903
+msgid "Update News"
+msgstr ""
+
+#: newsScroller.php:927
+msgid "Add News"
+msgstr ""
+
+#: newsScroller.php:936
+msgid "News Title"
+msgstr ""
+
+#: newsScroller.php:942
+msgid "This title will scroll"
+msgstr ""
+
+#: newsScroller.php:946
+msgid "News Url"
+msgstr ""
+
+#: newsScroller.php:952
+msgid "On news title click users will redirect to this url."
+msgstr ""
+
+#: newsScroller.php:956
+msgid "News Content"
+msgstr ""
+
+#: newsScroller.php:962
+msgid "Two three lines summary"
+msgstr ""
+
+#: newsScroller.php:972
+msgid "Save Changes"
+msgstr ""
+
+#: newsScroller.php:972
+msgid "Cancel"
+msgstr ""
+
+#: newsScroller.php:1072
+msgid "News deleted successfully."
+msgstr ""
+
+#: newsScroller.php:1080 newsScroller.php:1147
+msgid "Error while deleting news."
+msgstr ""
+
+#: newsScroller.php:1139
+msgid "selected news deleted successfully."
+msgstr ""
+
+#: newsScroller.php:1571
+msgid "News Scroller Type:"
+msgstr ""
+
+#: newsScroller.php:1580
+msgid "Modern"
+msgstr ""
+
+#: newsScroller.php:1589
+msgid "Classic"
+msgstr ""
+
+#: newsScroller.php:1594
+msgid "Title:"
+msgstr ""
+
+#: newsScroller.php:1601
+msgid "Add link to news title:"
+msgstr ""
+
+#: newsScroller.php:1603
+msgid "Max item from news:"
+msgstr ""
+
+#: newsScroller.php:1608
+msgid "Height of scroller:"
+msgstr ""
+
+#: newsScroller.php:1612
+msgid "Padding:"
+msgstr ""
+
+#: newsScroller.php:1619
+msgid "Show news content:"
+msgstr ""
+
+#: newsScroller.php:1630 newsScroller.php:1642
+msgid "Delay:"
+msgstr ""
+
+#: newsScroller.php:1631
+msgid "Micro Sec"
+msgstr ""
+
+#: newsScroller.php:1654
+msgid "Speed:"
+msgstr ""
+
+#: newsScroller.php:1665
+msgid "Scroll Amount:"
+msgstr ""
+
+#: newsScroller.php:1666
+msgid "(Ie 1,2,3)"
+msgstr ""
+
+#: newsScroller.php:1669
+msgid "Direction:"
+msgstr ""
+
+#: newsScroller.php:1678
+msgid "Up"
+msgstr ""
+
+#: newsScroller.php:1687
+msgid "Down"
+msgstr ""
+
+#: newsScroller.php:1718
+msgid "JQuery Scroller Library:"
+msgstr ""
+
+#: newsScroller.php:1728
+msgid "V1"
+msgstr ""
+
+#: newsScroller.php:1737
+msgid "V2"
+msgstr ""
+
+#. Plugin Name of the plugin/theme
+msgid "Vertical News Scroller"
+msgstr ""
+
+#. Plugin URI of the plugin/theme
+msgid ""
+"https://www.i13websolution.com/product/wordpress-vertical-news-scroller-pro/"
+msgstr ""
+
+#. Description of the plugin/theme
+msgid ""
+"Plugin for scrolling Vertical News on wordpress theme.Admin can add any "
+"number of news."
+msgstr ""
+
+#. Author of the plugin/theme
+msgid "I Thirteen Web Solution"
+msgstr ""
+
+#. Author URI of the plugin/theme
+msgid "http://www.i13websolution.com"
+msgstr ""
