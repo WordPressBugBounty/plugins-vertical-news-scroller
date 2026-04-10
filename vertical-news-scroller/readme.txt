@@ -4,8 +4,8 @@ Tags:Vertical news,Vertical scrolling news,Scrolling news WordPress,WordPress dy
 Donate link: http://www.i13websolution.com/donate_for_news_scroller.php
 Requires at least:3.0
 Tested up to:6.9
-Stable tag:1.25
-Version:1.25
+Stable tag:1.26
+Version:1.26
 License:GPLv2 or later
 License URI:http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -108,6 +108,13 @@ This plugin is easy to install like other plug-ins of Wordpress as you need to j
 This plugin is free for everyone! Since it's released under the GPL, you can use it free of charge on your personal or commercial blog. But you can make some donations if you realy find it useful.
 
 == Changelog ==
+
+
+= 1.26 =
+
+* Fixed news link update not working
+
+
 
 = 1.25 =
 

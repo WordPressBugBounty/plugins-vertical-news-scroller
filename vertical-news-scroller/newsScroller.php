@@ -6,7 +6,7 @@
 	Description: Plugin for scrolling Vertical News on wordpress theme.Admin can add any number of news.
 	Author:I Thirteen Web Solution
 	Text Domain:vertical-news-scroller
-	Version:1.25
+	Version:1.26
 	*/
 
 	//add_action( 'admin_init', 'vertical_news_scroller_plugin_admin_init' );
@@ -739,11 +739,13 @@
                                                             $wpdb->prefix . 'scroll_news', 
                                                             array( 
                                                                                                     'title' => $title,    
-                                                                                                    'content' => $contant
+                                                                                                    'content' => $contant,
+                                                                                                    'custom_link' => $newsurl, 
                                                                                     ), 
                                                             array( 'id' => $newsId ), 
                                                             array( 
                                                                                                     '%s',    
+                                                                                                    '%s' ,   
                                                                                                     '%s'    
                                                                                     ), 
                                                             array( '%d' ) 
