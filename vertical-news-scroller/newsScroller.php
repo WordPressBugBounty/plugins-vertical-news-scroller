@@ -6,13 +6,14 @@
 	Description: Plugin for scrolling Vertical News on wordpress theme.Admin can add any number of news.
 	Author:I Thirteen Web Solution
 	Text Domain:vertical-news-scroller
-	Version:1.26
+	Version:1.31
 	*/
 
 	//add_action( 'admin_init', 'vertical_news_scroller_plugin_admin_init' );
 	register_activation_hook(__FILE__, 'vns_install_newsscroller');
 	register_deactivation_hook(__FILE__, 'vns_vertical_news_remove_access_capabilities');
 	add_shortcode('print_vertical_news_scroll', 'vns_print_verticalScroll_func'); 
+	add_action('init', 'vns_register_block');
 	add_action('admin_menu', 'vns_scrollnews_plugin_menu');  
 	add_filter('widget_text', 'do_shortcode');
 	/* Add our function to the widgets_init hook. */
@@ -183,13 +184,81 @@
 
                 if (!is_admin()) {                                                       
 
-                                wp_register_style('news-style', plugins_url('/css/newsscrollcss.css', __FILE__), array(), '1.19');
+                                wp_register_style('news-style', plugins_url('/css/newsscrollcss.css', __FILE__), array(), '1.22');
                                 wp_register_script('newscript', plugins_url('/js/jv.js', __FILE__), array ('jquery'), '2.0');
                                 wp_register_script('newscriptv2', plugins_url('/js/i13_newsTicker.js', __FILE__), array ('jquery'), '1.15');
+                                wp_register_script('newscriptv3', plugins_url('/js/i13_newsTickerV3.js', __FILE__), array ('jquery'), '1.0');
 
                 }  
         }   
         
+    }
+
+    if(!function_exists('vns_register_block')){
+        function vns_register_block() {
+            if ( ! function_exists( 'register_block_type' ) ) {
+                return;
+            }
+
+            wp_register_script(
+                'vns-block-editor-free',
+                plugins_url( '/blocks/block.js', __FILE__ ),
+                array( 'wp-blocks', 'wp-element', 'wp-block-editor', 'wp-components', 'wp-i18n' ),
+                '1.1',
+                true
+            );
+
+            $attributes = array(
+                's_type'                => array( 'type' => 'string',  'default' => 'modern' ),
+                'lib'                   => array( 'type' => 'string',  'default' => 'v3' ),
+                'style_preset'          => array( 'type' => 'string',  'default' => 'default' ),
+                'maxitem'               => array( 'type' => 'number',  'default' => 5 ),
+                'height'                => array( 'type' => 'number',  'default' => 200 ),
+                'width'                 => array( 'type' => 'string',  'default' => '100%' ),
+                'direction'             => array( 'type' => 'string',  'default' => 'up' ),
+                'padding'               => array( 'type' => 'number',  'default' => 10 ),
+                'show_content'          => array( 'type' => 'boolean', 'default' => true ),
+                'add_link_to_title'     => array( 'type' => 'boolean', 'default' => true ),
+                'modern_scroller_delay' => array( 'type' => 'number',  'default' => 5000 ),
+                'modern_speed'          => array( 'type' => 'number',  'default' => 1700 ),
+                'delay'                 => array( 'type' => 'number',  'default' => 60 ),
+                'scrollamount'          => array( 'type' => 'number',  'default' => 1 ),
+            );
+
+            register_block_type( 'i13/vertical-news-scroller-free', array(
+                'editor_script'   => 'vns-block-editor-free',
+                'render_callback' => 'vns_block_render_callback_free',
+                'attributes'      => $attributes,
+            ) );
+        }
+    }
+
+    if(!function_exists('vns_block_render_callback_free')){
+        function vns_block_render_callback_free( $attributes ) {
+            $a = $attributes;
+            $sc  = '[print_vertical_news_scroll';
+            $sc .= ' s_type="'             . esc_attr( $a['s_type'] )             . '"';
+            $sc .= ' lib="'                . esc_attr( $a['lib'] )                . '"';
+            $sc .= ' style_preset="'       . esc_attr( $a['style_preset'] )       . '"';
+            $sc .= ' maxitem="'            . intval( $a['maxitem'] )              . '"';
+            $sc .= ' height="'             . intval( $a['height'] )               . '"';
+            $sc .= ' width="'              . esc_attr( $a['width'] )              . '"';
+            $sc .= ' direction="'          . esc_attr( $a['direction'] )          . '"';
+            $sc .= ' padding="'            . intval( $a['padding'] )              . '"';
+            $sc .= ' show_content="'       . ( $a['show_content'] ? '1' : '0' )   . '"';
+            $sc .= ' add_link_to_title="'  . ( $a['add_link_to_title'] ? '1' : '0' ) . '"';
+
+            if ( $a['s_type'] === 'modern' ) {
+                $sc .= ' modern_scroller_delay="' . intval( $a['modern_scroller_delay'] ) . '"';
+                $sc .= ' modern_speed="'          . intval( $a['modern_speed'] )           . '"';
+            } else {
+                $sc .= ' delay="'        . intval( $a['delay'] )        . '"';
+                $sc .= ' scrollamount="' . intval( $a['scrollamount'] ) . '"';
+            }
+            $sc .= ']';
+
+            return do_shortcode( $sc );
+        }
     }
 
     if(!function_exists('vns_table_column_exists')){
@@ -297,7 +366,7 @@
     
             function vns_scrollnews_plugin_menu() {
 
-                    $hook_suffix_v_n=add_menu_page(__('Scroll news', 'vertical-news-scroller'), __('Manage Scrolling News', 'vertical-news-scroller'), 'vns_vertical_news_scroller_view_news', 'Scrollnews-settings', 'vns_managenews');
+                    $hook_suffix_v_n=add_menu_page(__('Scroll news', 'vertical-news-scroller'), __('Manage Scrolling News', 'vertical-news-scroller'), 'vns_vertical_news_scroller_view_news', 'Scrollnews-settings', 'vns_managenews', 'dashicons-rss', 26);
                     add_action('load-' . $hook_suffix_v_n, 'vertical_news_scroller_plugin_admin_init');
             }
       }
@@ -348,6 +417,11 @@
 
                             ?> 
                             <div id="poststuff">
+                                    <div style="background:#f0f6fc;border:1px solid #c3daef;border-left:4px solid #8224e3;border-radius:4px;padding:14px 18px;margin-bottom:18px;font-size:13px;color:#333;">
+                                        <strong><?php echo __('Want more from your news scroller?', 'vertical-news-scroller'); ?></strong>
+                                        <?php echo __('Pro adds unlimited categories, automatic RSS feeds, more visual styles, custom colors, and a lightbox preview.', 'vertical-news-scroller'); ?>
+                                        <a href="https://www.i13websolution.com/product/wordpress-vertical-news-scroller-pro/" target="_blank" style="font-weight:600;color:#8224e3;text-decoration:none;"><?php echo __('See Pro features', 'vertical-news-scroller'); ?> →</a>
+                                    </div>
                                     <table><tr>
                                                     <td>
                                                               <div class="fb-like" data-href="https://www.facebook.com/i13websolution" data-layout="button" data-action="like" data-size="large" data-show-faces="false" data-share="false"></div>
@@ -360,14 +434,8 @@
                                                                       fjs.parentNode.insertBefore(js, fjs);
                                                                     }(document, 'script', 'facebook-jssdk'));</script>
                                                       </td>
-                                                    <td>
-                                                            <a target="_blank" title="Donate" href="https://www.paypal.com/cgi-bin/webscr?cmd=_donations&amp;business=nvgandhi123@gmail.com&amp;item_name=Scroller News&amp;item_number=scroll news support&amp;no_shipping=0&amp;no_note=1&amp;tax=0&amp;currency_code=USD&amp;lc=US&amp;bn=PP%2dDonationsBF&amp;charset=UTF%2d8">
-                                                                    <img id="help us for free plugin" height="30" width="90" src="<?php echo esc_html(plugins_url('images/paypaldonate.jpg', __FILE__)); ?>" border="0" alt="help us for free plugin" title="help us for free plugin">
-                                                            </a>
-                                                    </td>
                                             </tr>
                                     </table>
-                                    <span><h3 style="color: blue;"><a target="_blank" href="https://www.i13websolution.com/product/wordpress-vertical-news-scroller-pro/"><?php echo __('UPGRADE TO PRO VERSION', 'vertical-news-scroller'); ?></a></h3></span>
 
                             <?php 
 
@@ -610,15 +678,74 @@
                                                             </div>
                                                             <br/>
                                                             <br/>
-                                                            <h3><?php echo __('To print this news scroller either you can use theme widget feature or use below shortcode', 'vertical-news-scroller'); ?></h3>
-                                                            <h4><?php echo __('JQuery Scroller', 'vertical-news-scroller'); ?></h4>
-                                                            <textarea style="text-align:left" cols="80" rows="3" onclick="this.focus(); this.select()">[print_vertical_news_scroll s_type="modern" maxitem="5" padding="10" add_link_to_title="1" show_content="1" modern_scroller_delay="5000" modern_speed="1700" height="200" width="100%" direction="up" lib="v1" ]</textarea>
-                                                               <br/>
-                                                            <div> <?php echo __('Use', 'vertical-news-scroller'); ?> lib="v2" <?php echo __('If you find problem with v1', 'vertical-news-scroller'); ?></div>
-
+                                                            <div class="clear"></div>
                                                             <br/>
-                                                            <h4><?php echo __('Marquee Scroller', 'vertical-news-scroller'); ?></h4>
-                                                            <textarea style="text-align:left" cols="80" rows="3" onclick="this.focus(); this.select()">[print_vertical_news_scroll s_type="classic" maxitem="5" padding="10" add_link_to_title="1" show_content="1" delay="60" height="200" width="100%" scrollamount="1" direction="up" ]</textarea>
+                                                            <br/>
+                                                            <style>
+                                                                .vns-help-wrap{max-width:980px;}
+                                                                .vns-help-card{background:#fff;border:1px solid #e2e8f0;border-radius:8px;padding:18px 20px;margin-bottom:18px;box-shadow:0 1px 3px rgba(0,0,0,.04);}
+                                                                .vns-help-card h4{margin:0 0 6px;font-size:15px;}
+                                                                .vns-help-card p.vns-help-desc{margin:0 0 12px;color:#555;font-size:13px;}
+                                                                .vns-code-box{position:relative;}
+                                                                .vns-code-box textarea{width:100%;box-sizing:border-box;font-family:Consolas,Monaco,monospace;font-size:12px;background:#f7f7fa;border:1px solid #ddd;border-radius:5px;padding:10px 12px;resize:vertical;}
+                                                                .vns-copy-btn{position:absolute;top:8px;right:8px;background:#0073aa;color:#fff;border:none;border-radius:4px;padding:4px 10px;font-size:11px;cursor:pointer;}
+                                                                .vns-copy-btn:hover{background:#005d87;}
+                                                                .vns-badge-row{margin:10px 0 4px;}
+                                                                .vns-badge{display:inline-block;background:#eef2ff;color:#4338ca;font-size:11px;font-weight:600;border-radius:4px;padding:3px 9px;margin:0 6px 6px 0;}
+                                                            </style>
+                                                            <div class="vns-help-wrap">
+                                                                <h3 style="margin-bottom:14px;"><?php echo __('Add this scroller using the block editor, a theme widget, or the shortcode below', 'vertical-news-scroller'); ?></h3>
+
+                                                                <div class="vns-help-card">
+                                                                    <h4>🧩 <?php echo __('Block Editor (Gutenberg)', 'vertical-news-scroller'); ?></h4>
+                                                                    <p class="vns-help-desc"><?php echo __('Prefer not to use a shortcode? Add the scroller directly from the block editor.', 'vertical-news-scroller'); ?></p>
+                                                                    <ol style="font-size:13px;color:#444;padding-left:20px;margin:0 0 10px;">
+                                                                        <li><?php echo __('Edit a Post or Page, click the (+) Add Block icon.', 'vertical-news-scroller'); ?></li>
+                                                                        <li><?php echo __('Search for "News Scroller" and select the block.', 'vertical-news-scroller'); ?></li>
+                                                                        <li><?php echo __('Open the block settings panel on the right (Inspector) to set items, display, layout, style, and scroller options.', 'vertical-news-scroller'); ?></li>
+                                                                    </ol>
+                                                                    <p class="vns-help-desc" style="margin:0;"><?php echo __('The editor preview shows a summary card rather than a live scroller - the actual scrolling animation appears once the page is viewed on the frontend.', 'vertical-news-scroller'); ?></p>
+                                                                </div>
+
+                                                                <div class="vns-help-card">
+                                                                    <h4>🔁 <?php echo __('JQuery Scroller (recommended)', 'vertical-news-scroller'); ?></h4>
+                                                                    <p class="vns-help-desc"><?php echo __('Smoothly scrolls items one at a time. Uses the v3 engine by default - lightweight and reliable across themes.', 'vertical-news-scroller'); ?></p>
+                                                                    <div class="vns-code-box">
+                                                                        <button type="button" class="vns-copy-btn" onclick="vnsCopyBox(this)"><?php echo __('Copy', 'vertical-news-scroller'); ?></button>
+                                                                        <textarea readonly style="text-align:left" cols="80" rows="3" onclick="this.focus(); this.select()">[print_vertical_news_scroll s_type="modern" maxitem="5" padding="10" add_link_to_title="1" show_content="1" modern_scroller_delay="5000" modern_speed="1700" height="200" width="100%" direction="up" lib="v3" ]</textarea>
+                                                                    </div>
+                                                                    <div class="vns-badge-row">
+                                                                        <span class="vns-badge">lib="v3" (recommended)</span>
+                                                                        <span class="vns-badge">lib="v2"</span>
+                                                                        <span class="vns-badge">lib="v1"</span>
+                                                                    </div>
+                                                                    <p class="vns-help-desc" style="margin-top:8px;"><?php echo __('lib selects the scroller engine (only applies when s_type="modern"). If v1 or v2 behave inconsistently on your theme, use lib="v3" - a lighter, more reliable engine.', 'vertical-news-scroller'); ?></p>
+                                                                </div>
+
+                                                                <div class="vns-help-card">
+                                                                    <h4>📰 <?php echo __('Marquee Scroller (classic, continuous scroll)', 'vertical-news-scroller'); ?></h4>
+                                                                    <p class="vns-help-desc"><?php echo __('A simple continuous scroll, similar to the old HTML marquee tag but theme-safe.', 'vertical-news-scroller'); ?></p>
+                                                                    <div class="vns-code-box">
+                                                                        <button type="button" class="vns-copy-btn" onclick="vnsCopyBox(this)"><?php echo __('Copy', 'vertical-news-scroller'); ?></button>
+                                                                        <textarea readonly style="text-align:left" cols="80" rows="3" onclick="this.focus(); this.select()">[print_vertical_news_scroll s_type="classic" maxitem="5" padding="10" add_link_to_title="1" show_content="1" delay="60" height="200" width="100%" scrollamount="1" direction="up" ]</textarea>
+                                                                    </div>
+                                                                </div>
+
+                                                                <div style="background:#f0f6fc;border:1px solid #c3daef;border-radius:6px;padding:14px 16px;margin-bottom:18px;font-size:13px;color:#333;">
+                                                                    <?php echo __('Want unlimited news categories, RSS feeds, more visual styles, and a lightbox preview?', 'vertical-news-scroller'); ?>
+                                                                    <a href="https://www.i13websolution.com/product/wordpress-vertical-news-scroller-pro/" target="_blank" style="font-weight:600;"><?php echo __('Upgrade to Pro', 'vertical-news-scroller'); ?> →</a>
+                                                                </div>
+                                                            </div>
+                                                            <script>
+                                                                function vnsCopyBox(btn){
+                                                                    var box = btn.parentNode.querySelector('textarea');
+                                                                    box.select();
+                                                                    document.execCommand('copy');
+                                                                    var original = btn.textContent;
+                                                                    btn.textContent = '<?php echo esc_js(__('Copied!', 'vertical-news-scroller')); ?>';
+                                                                    setTimeout(function(){ btn.textContent = original; }, 1200);
+                                                                }
+                                                            </script>
                                                     </form>
                                                     <script type="text/JavaScript">
 
@@ -649,30 +776,33 @@
 
                                                     <br class="clear">
                                             </div>
-                                            <div id="postbox-container-1" class="postbox-container"> 
-
-
-                                                    <div class="postbox"> 
-                                                            <h3 class="hndle"><span></span><?php echo __('New AI DIVI Theme', 'vertical-news-scroller'); ?></h3> 
-                                                            <div class="inside">
-                                                                    <center><a href="https://www.elegantthemes.com/affiliates/idevaffiliate.php?id=11715&url=80806" target="_blank"><img border="0" src="<?php echo esc_url(plugins_url('images/divi_300x250.jpg', __FILE__)); ?>" width="250" height="250"></a></center>
-
-                                                                    <div style="margin:10px 5px">
-
-                                                                    </div>
-                                                            </div></div>
-
-                                                     <div class="postbox"> 
-                                                            <h3 class="hndle"><span></span><?php echo __('Google For Business Coupon', 'vertical-news-scroller'); ?></h3> 
-                                                                    <div class="inside">
-                                                                            <center><a href="http://i13websolution.com/google-workspace.html" target="_blank">
-                                                                                            <img src="<?php echo esc_url(plugins_url('images/g-suite-promo-code-4.png', __FILE__)); ?>" width="250" height="250" border="0">
-                                                                                    </a></center>
-                                                                            <div style="margin:10px 5px">
-                                                                            </div>
-                                                                    </div>
-
-                                                            </div>
+                                            <div id="postbox-container-1" class="postbox-container">
+                                                <style>
+                                                    .vns-pro-sidebar{background:#fff;border:1px solid #e2e8f0;border-radius:8px;padding:20px;box-shadow:0 1px 3px rgba(0,0,0,.05);}
+                                                    .vns-pro-sidebar h3{margin:0 0 4px;font-size:16px;color:#2d3436;}
+                                                    .vns-pro-sidebar .vns-pro-tag{display:inline-block;background:#8224e3;color:#fff;font-size:11px;font-weight:600;border-radius:12px;padding:2px 10px;margin-bottom:10px;}
+                                                    .vns-pro-sidebar ul{list-style:none;margin:14px 0;padding:0;}
+                                                    .vns-pro-sidebar ul li{font-size:13px;color:#333;margin-bottom:10px;padding-left:22px;position:relative;line-height:1.4;}
+                                                    .vns-pro-sidebar ul li:before{content:"✓";position:absolute;left:0;color:#22c55e;font-weight:700;}
+                                                    .vns-pro-sidebar .vns-pro-cta{display:block;text-align:center;background:#8224e3;color:#fff !important;font-weight:600;font-size:13px;padding:10px 12px;border-radius:5px;text-decoration:none;margin-top:6px;}
+                                                    .vns-pro-sidebar .vns-pro-cta:hover{background:#6c1bb8;}
+                                                    .vns-pro-sidebar .vns-pro-foot{font-size:11px;color:#999;text-align:center;margin-top:10px;}
+                                                </style>
+                                                <div class="vns-pro-sidebar">
+                                                    <span class="vns-pro-tag"><?php echo __('PRO', 'vertical-news-scroller'); ?></span>
+                                                    <h3><?php echo __('Get more from your news scroller', 'vertical-news-scroller'); ?></h3>
+                                                    <ul>
+                                                        <li><?php echo __('Unlimited news categories - organize news by section, not just one list', 'vertical-news-scroller'); ?></li>
+                                                        <li><?php echo __('Automatic RSS feeds - pull in headlines from BBC, Reuters, or any site', 'vertical-news-scroller'); ?></li>
+                                                        <li><?php echo __('Full block editor settings - colors, presets, lightbox, and more, right in the Gutenberg sidebar', 'vertical-news-scroller'); ?></li>
+                                                        <li><?php echo __('4 visual style presets - Default, Card, Minimal, Headline', 'vertical-news-scroller'); ?></li>
+                                                        <li><?php echo __('Lightbox preview - readers preview a headline without leaving the page', 'vertical-news-scroller'); ?></li>
+                                                        <li><?php echo __('Thumbnail images, custom colors and fonts', 'vertical-news-scroller'); ?></li>
+                                                        <li><?php echo __('News/Event/Announcement/Notice colored labels', 'vertical-news-scroller'); ?></li>
+                                                    </ul>
+                                                    <a class="vns-pro-cta" href="https://www.i13websolution.com/product/wordpress-vertical-news-scroller-pro/" target="_blank"><?php echo __('Upgrade to Pro', 'vertical-news-scroller'); ?> →</a>
+                                                    <div class="vns-pro-foot"><?php echo __('One-time payment - no monthly fee', 'vertical-news-scroller'); ?></div>
+                                                </div>
                                             </div>
 
                                     </div>  
@@ -683,7 +813,6 @@
                             ?>
                             <br/>
 
-                            <span><h3 style="color: blue;"><a target="_blank" href="https://www.i13websolution.com/product/wordpress-vertical-news-scroller-pro/"><?php echo __('UPGRADE TO PRO VERSION', 'vertical-news-scroller'); ?></a></h3></span>
                             <?php        
                             if (isset($_POST['btnsave'])) {
 
@@ -862,15 +991,9 @@
                                                                       fjs.parentNode.insertBefore(js, fjs);
                                                                     }(document, 'script', 'facebook-jssdk'));</script>
                                                       </td>
-                                                    <td>
-                                                            <a target="_blank" title="Donate" href="https://www.paypal.com/cgi-bin/webscr?cmd=_donations&amp;business=nvgandhi123@gmail.com&amp;item_name=Scroller News&amp;item_number=scroll news support&amp;no_shipping=0&amp;no_note=1&amp;tax=0&amp;currency_code=USD&amp;lc=US&amp;bn=PP%2dDonationsBF&amp;charset=UTF%2d8">
-                                                                    <img id="help us for free plugin"  height="30" width="90" src="<?php echo esc_url(plugins_url('images/paypaldonate.jpg', __FILE__)); ?>" border="0" alt="help us for free plugin" title="help us for free plugin">
-                                                            </a>
-
-                                                    </td>
                                             </tr></table>
                                     <div id="poststuff">
-                                            <div id="post-body" class="metabox-holder columns-2">
+                                            <div id="post-body" class="metabox-holder columns-1">
                                                     <div id="post-body-content">
                                                             <div class="wrap">
                                                             <?php 
@@ -931,7 +1054,7 @@
                                                             <?php } ?>
 
                                                                     <div id="poststuff">
-                                                                            <div id="post-body" class="metabox-holder columns-2">
+                                                                            <div id="post-body" class="metabox-holder columns-1">
                                                                                     <div id="post-body-content">
                                                                                             <form method="post" action="" id="addnews" name="addnews">
 
@@ -993,32 +1116,7 @@
                                                                     </div>  
                                                             </div>      
                                                     </div>
-                                                    <div id="postbox-container-1" class="postbox-container"> 
-
-                                                            <div class="postbox"> 
-                                                                    <h3 class="hndle"><span></span><?php echo __('Access All Themes One price', 'vertical-news-scroller'); ?></h3> 
-                                                                    <div class="inside">
-                                                                            <center><a href="http://www.elegantthemes.com/affiliates/idevaffiliate.php?id=11715_0_1_10" target="_blank"><img border="0" src="<?php echo esc_url(plugins_url('images/300x250.gif', __FILE__)); ?>" width="250" height="250"></a></center>
-
-                                                                            <div style="margin:10px 5px">
-
-                                                                            </div>
-                                                                    </div></div>
-
-                                                            <div class="postbox"> 
-                                                            <h3 class="hndle"><span></span><?php echo __('Google For Business Coupon', 'vertical-news-scroller'); ?></h3> 
-                                                                    <div class="inside">
-                                                                            <center><a href="http://i13websolution.com/google-workspace.html" target="_blank">
-                                                                                            <img src="<?php echo esc_url(plugins_url('images/g-suite-promo-code-4.png', __FILE__)); ?>" width="250" height="250" border="0">
-                                                                                    </a></center>
-                                                                            <div style="margin:10px 5px">
-                                                                            </div>
-                                                                    </div>
-
-                                                            </div>
-
-
-                                                    </div> 
+                                                    
 
                                             </div>         
 
@@ -1192,7 +1290,8 @@
                     extract(shortcode_atts(array('modern_speed' => 1700,), $atts));
                     extract(shortcode_atts(array('s_type' => 'modern',), $atts));
                     extract(shortcode_atts(array('direction' => 'up',), $atts));
-                    extract(shortcode_atts(array('lib' => 'v1',), $atts));
+                    extract(shortcode_atts(array('lib' => 'v3',), $atts));
+                    extract(shortcode_atts(array('style_preset' => 'default',), $atts));
 
                     $maxitem=intval($maxitem);
                     $padding=intval($padding);
@@ -1206,6 +1305,10 @@
                     $modern_speed=intval($modern_speed);
                     $s_type=sanitize_text_field($s_type);
                     $direction=sanitize_text_field($direction);
+                    $style_preset=sanitize_text_field($style_preset);
+                    if ('card'!==$style_preset) {
+                            $style_preset='default';
+                    }
 
                     $randomNum=rand(0, 10000);
                     if ('classic'==$s_type) {
@@ -1220,7 +1323,9 @@
 
                     wp_enqueue_style('news-style');
                     wp_enqueue_script('jquery');
-                    if ('v2'==$lib) {
+                    if ('v3'==$lib) {
+                              wp_enqueue_script('newscriptv3');
+                    } else if ('v2'==$lib) {
                               wp_enqueue_script('newscriptv2');
                     } else {
                             wp_enqueue_script('newscript');
@@ -1234,7 +1339,7 @@
                       <?php if ('classic'==$news_style) { ?>  
                             <marquee height='<?php echo esc_html($height); ?>' direction="<?php echo esc_html(strtolower($direction)); ?>"  onmouseout="this.start()" onmouseover="this.stop()" scrolldelay="<?php echo esc_html($delay); ?>" truespeed scrollamount="<?php echo esc_html($scrollamount); ?>" direction="up" behavior="scroll" >
                       <?php } ?>  
-                             <div id="news-container_<?php echo esc_html($randomNum); ?>" class="news-container" style="max-width: <?php echo esc_html($width); ?>;visibility: hidden">
+                             <div id="news-container_<?php echo esc_html($randomNum); ?>" class="news-container<?php echo ('card'===$style_preset) ? ' vns-style-card' : ''; ?>" style="width: <?php echo esc_html($width); ?>;visibility: hidden">
                                     <ul>
                                     <?php
 
@@ -1281,7 +1386,7 @@
                                     </marquee>
                        <?php } ?>
                             <?php if ('modern'==$news_style) { ?>
-                                    <script type="text/javascript"><?php $intval= esc_html(uniqid('interval_')); ?>var <?php echo esc_html($intval); ?> = setInterval(function() {if(document.readyState === 'complete') {clearInterval(<?php echo esc_html($intval); ?>);jQuery("#news-container_<?php echo esc_html($randomNum); ?>").css('visibility','visible');<?php if ('v2'==$lib) : ?>jQuery('#news-container_<?php echo esc_html($randomNum); ?>').vtickerv2({ speed: <?php echo esc_html($modern_speed); ?>,pause: <?php echo esc_html($modern_scroller_delay); ?>,animating: true,mousePause: true,height:<?php echo esc_html($height); ?>,direction:'<?php echo esc_html($direction); ?>'});  <?php else : ?>   jQuery(function(){jQuery('#news-container_<?php echo esc_html($randomNum); ?>').vTicker({ speed: <?php echo esc_html($modern_speed); ?>,pause: <?php echo esc_html($modern_scroller_delay); ?>,animation: '',mousePause: true,height:<?php echo esc_html($height); ?>,direction:'<?php echo esc_html($direction); ?>'});  });<?php endif; ?>}    }, 100);</script><!-- end print_verticalScroll_func -->
+                                    <script type="text/javascript"><?php $intval= esc_html(uniqid('interval_')); ?>var <?php echo esc_html($intval); ?> = setInterval(function() {if(document.readyState === 'complete') {clearInterval(<?php echo esc_html($intval); ?>);jQuery("#news-container_<?php echo esc_html($randomNum); ?>").css('visibility','visible');<?php if ('v2'==$lib) : ?>jQuery('#news-container_<?php echo esc_html($randomNum); ?>').vtickerv2({ speed: <?php echo esc_html($modern_speed); ?>,pause: <?php echo esc_html($modern_scroller_delay); ?>,animating: true,mousePause: true,height:<?php echo esc_html($height); ?>,direction:'<?php echo esc_html($direction); ?>'});  <?php elseif ('v3'==$lib) : ?>jQuery('#news-container_<?php echo esc_html($randomNum); ?>').vtickerv3({ speed: <?php echo esc_html($modern_speed); ?>,pause: <?php echo esc_html($modern_scroller_delay); ?>,height:<?php echo esc_html($height); ?>,direction:'<?php echo esc_html($direction); ?>',mousePause: true});  <?php else : ?>   jQuery(function(){jQuery('#news-container_<?php echo esc_html($randomNum); ?>').vTicker({ speed: <?php echo esc_html($modern_speed); ?>,pause: <?php echo esc_html($modern_scroller_delay); ?>,animation: '',mousePause: true,height:<?php echo esc_html($height); ?>,direction:'<?php echo esc_html($direction); ?>'});  });<?php endif; ?>}    }, 100);</script><!-- end print_verticalScroll_func -->
                                     <?php
                             } else { 
                                     ?>
@@ -1336,14 +1441,20 @@
                             $modern_speed=empty($instance['modern_speed']) ? 1700 :intval($instance['modern_speed']); 
                             $s_type=empty($instance['s_type']) ? 'classic' :sanitize_text_field($instance['s_type']); 
                             $direction=empty($instance['direction']) ? 'up' :sanitize_text_field($instance['direction']); 
-                            $lib=sanitize_sql_orderby(empty($instance['lib_version']) ? 'v1' :$instance['lib_version']); 
+                            $lib=sanitize_text_field(empty($instance['lib_version']) ? 'v3' :$instance['lib_version']); 
+                            $style_preset=sanitize_text_field(empty($instance['style_preset']) ? 'default' :$instance['style_preset']);
+                            if ('card'!==$style_preset) {
+                                    $style_preset='default';
+                            }
 
 
                             $randomNum=rand(0, 10000);
                             $news_style='classic';
 
 
-                            if ('v2'==$lib) {
+                            if ('v3'==$lib) {
+                                      wp_enqueue_script('newscriptv3');
+                            } else if ('v2'==$lib) {
                                       wp_enqueue_script('newscriptv2');
                             } else {
 
@@ -1366,7 +1477,7 @@
                             <?php if ('classic'==$news_style) { ?>  
                                     <marquee height='<?php echo esc_html($height); ?>' direction='<?php echo esc_html($direction); ?>'  onmouseout="this.start()" onmouseover="this.stop()" scrolldelay="<?php echo esc_html($delay); ?>" scrollamount="<?php echo esc_html($scrollamt); ?>" direction="up" behavior="scroll" >
                             <?php } ?>    
-                                            <div id="news-container_<?php echo esc_html($randomNum); ?>" class="news-container" style="visibility: hidden">
+                                            <div id="news-container_<?php echo esc_html($randomNum); ?>" class="news-container<?php echo ('card'===$style_preset) ? ' vns-style-card' : ''; ?>" style="visibility: hidden">
                                     <?php if (!$show_content) : ?>
                                              <style>.news-info{display:inline-block;}.news-img{padding-bottom: 20px}</style>
                                     <?php endif; ?>
@@ -1413,7 +1524,7 @@
                                     </marquee>
                                     <?php } ?>
                             <?php if ('modern'==$news_style) { ?>
-                                    <script type="text/javascript"><?php $intval= uniqid('interval_'); ?> var <?php echo esc_html($intval); ?> = setInterval(function() { if(document.readyState === 'complete') { clearInterval(<?php echo esc_html($intval); ?>); jQuery("#news-container_<?php echo esc_html($randomNum); ?>").css('visibility','visible'); <?php if ('v2'==$lib) : ?> jQuery('#news-container_<?php echo esc_html($randomNum); ?>').vtickerv2({  speed: <?php echo esc_html($modern_speed); ?>, pause: <?php echo esc_html($modern_scroller_delay); ?>, animating: true, mousePause: true, height:<?php echo esc_html($height); ?>, direction:'<?php echo esc_html($direction); ?>' });  <?php else : ?>   jQuery(function(){ jQuery('#news-container_<?php echo esc_html($randomNum); ?>').vTicker({  speed: <?php echo esc_html($modern_speed); ?>, pause: <?php echo esc_html($modern_scroller_delay); ?>, animation: '', mousePause: true, height:<?php echo esc_html($height); ?>, direction:'<?php echo esc_html($direction); ?>' });  }); <?php endif; ?> }  }, 100); </script>
+                                    <script type="text/javascript"><?php $intval= uniqid('interval_'); ?> var <?php echo esc_html($intval); ?> = setInterval(function() { if(document.readyState === 'complete') { clearInterval(<?php echo esc_html($intval); ?>); jQuery("#news-container_<?php echo esc_html($randomNum); ?>").css('visibility','visible'); <?php if ('v2'==$lib) : ?> jQuery('#news-container_<?php echo esc_html($randomNum); ?>').vtickerv2({  speed: <?php echo esc_html($modern_speed); ?>, pause: <?php echo esc_html($modern_scroller_delay); ?>, animating: true, mousePause: true, height:<?php echo esc_html($height); ?>, direction:'<?php echo esc_html($direction); ?>' });  <?php elseif ('v3'==$lib) : ?> jQuery(function(){ jQuery('#news-container_<?php echo esc_html($randomNum); ?>').vtickerv3({  speed: <?php echo esc_html($modern_speed); ?>, pause: <?php echo esc_html($modern_scroller_delay); ?>, height:<?php echo esc_html($height); ?>, direction:'<?php echo esc_html($direction); ?>', mousePause: true }); }); <?php else : ?>   jQuery(function(){ jQuery('#news-container_<?php echo esc_html($randomNum); ?>').vTicker({  speed: <?php echo esc_html($modern_speed); ?>, pause: <?php echo esc_html($modern_scroller_delay); ?>, animation: '', mousePause: true, height:<?php echo esc_html($height); ?>, direction:'<?php echo esc_html($direction); ?>' });  }); <?php endif; ?> }  }, 100); </script>
                                     <?php
                             } else { 
                                     ?>
@@ -1447,7 +1558,8 @@
                             $instance['modern_scroller_delay'] = sanitize_text_field($new_instance['modern_scroller_delay']);
                             $instance['modern_speed'] = intval($new_instance['modern_speed']);
                             $instance['direction'] = sanitize_text_field($new_instance['direction']);
-                            $instance['lib_version'] = sanitize_sql_orderby($new_instance['lib_version']);
+                            $instance['lib_version'] = sanitize_text_field($new_instance['lib_version']);
+                            $instance['style_preset'] = sanitize_text_field(isset($new_instance['style_preset']) ? $new_instance['style_preset'] : 'default');
                             return $instance;
 
 
@@ -1455,10 +1567,11 @@
                     public function form( $instance ) {
 
                             //Defaults
-                            $instance = wp_parse_args((array) $instance, array('s_type'=>'classic','title' => 'News','maxitem' => 5,'padding' => 5,'show_content' => 1,'delay'=>5,'scrollamount'=>1,'add_link_to_title'=>1,'height'=>200,'modern_scroller_delay'=>5000,'modern_speed'=>1700,'direction'=>'up','lib_version'=>'v1'));
+                            $instance = wp_parse_args((array) $instance, array('s_type'=>'classic','title' => 'News','maxitem' => 5,'padding' => 5,'show_content' => 1,'delay'=>5,'scrollamount'=>1,'add_link_to_title'=>1,'height'=>200,'modern_scroller_delay'=>5000,'modern_speed'=>1700,'direction'=>'up','lib_version'=>'v3','style_preset'=>'default'));
                             $scroller_type=$instance['s_type'];
                             $direction=$instance['direction'];
                             $lib_version=isset($instance['lib_version']) ? $instance['lib_version']:'v1';
+                            $style_preset=isset($instance['style_preset']) ? $instance['style_preset']:'default';
                             $randomNum=rand(0, 10000);
                             ?>
                             <?php
@@ -1634,7 +1747,23 @@
                                        endif;
                                             ?>
                                                              value="v2"><?php echo __('V2', 'vertical-news-scroller'); ?></option>
+                                            <option 
+                                            <?php 
+                                            if ('v3'==$lib_version) :
+                                                    ?>
+                                                     selected="" 
+                                                                                                                     <?php 
+                                       endif;
+                                            ?>
+                                                             value="v3"><?php echo __('V3 (Recommended)', 'vertical-news-scroller'); ?></option>
 
+                                    </select>
+                            </p>
+                            <p>
+                                    <label for="<?php echo esc_html($this->get_field_id('style_preset')); ?>"><b><?php echo __('Visual Style:', 'vertical-news-scroller'); ?></b></label><br/>
+                                    <select id="<?php echo esc_html($this->get_field_id('style_preset')); ?>" name="<?php echo esc_html($this->get_field_name('style_preset')); ?>">
+                                            <option <?php if ('default'==$style_preset) : ?>selected=""<?php endif; ?> value="default"><?php echo __('Default (original look)', 'vertical-news-scroller'); ?></option>
+                                            <option <?php if ('card'==$style_preset) : ?>selected=""<?php endif; ?> value="card"><?php echo __('Card (boxed, shadow)', 'vertical-news-scroller'); ?></option>
                                     </select>
                             </p>
                             <?php

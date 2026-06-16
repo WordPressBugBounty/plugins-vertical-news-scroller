@@ -7,3 +7,44 @@
 .scrollercontent{
   text-align:justify;
 }
+
+/* Card style preset - only applied when style_preset="card" is explicitly chosen */
+.news-container.vns-style-card ul li {
+    list-style: none !important;
+}
+.news-container.vns-style-card ul li > div {
+    background: #fff;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0,0,0,.07);
+    margin-bottom: 8px;
+    box-sizing: border-box;
+}
+.news-container.vns-style-card {
+    box-sizing: border-box;
+}
+.news-container.vns-style-card .newsscroller_title{
+  font-weight: bold;
+  font-size: 16px;
+  text-decoration: none;
+  color: #8224e3;
+  margin-bottom: 4px;
+}
+.news-container.vns-style-card .scrollercontent{
+  text-align:left;
+  font-size: 13px;
+  color: #555;
+  line-height: 1.5;
+}
+
+/* Pro upsell notice inside the scroller's empty state */
+.vns-pro-upsell {
+    font-size: 11px;
+    color: #999;
+    text-align: right;
+    margin-top: 4px;
+}
+.vns-pro-upsell a {
+    color: #8224e3;
+    text-decoration: none;
+}

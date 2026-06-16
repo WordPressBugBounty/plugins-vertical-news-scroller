@@ -1,0 +1,26 @@
+{
+    "apiVersion": 2,
+    "name": "i13/vertical-news-scroller-free",
+    "title": "News Scroller",
+    "category": "widgets",
+    "icon": "rss",
+    "description": "Display a vertical scrolling news ticker.",
+    "supports": { "html": false },
+    "textdomain": "vertical-news-scroller",
+    "attributes": {
+        "s_type":                { "type": "string",  "default": "modern" },
+        "lib":                   { "type": "string",  "default": "v3" },
+        "style_preset":          { "type": "string",  "default": "default" },
+        "maxitem":                { "type": "number",  "default": 5 },
+        "height":                { "type": "number",  "default": 200 },
+        "width":                 { "type": "string",  "default": "100%" },
+        "direction":             { "type": "string",  "default": "up" },
+        "padding":               { "type": "number",  "default": 10 },
+        "show_content":          { "type": "boolean", "default": true },
+        "add_link_to_title":     { "type": "boolean", "default": true },
+        "modern_scroller_delay": { "type": "number",  "default": 5000 },
+        "modern_speed":          { "type": "number",  "default": 1700 },
+        "delay":                 { "type": "number",  "default": 60 },
+        "scrollamount":          { "type": "number",  "default": 1 }
+    }
+}
