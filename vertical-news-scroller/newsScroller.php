@@ -6,8 +6,16 @@
 	Description: Plugin for scrolling Vertical News on wordpress theme.Admin can add any number of news.
 	Author:I Thirteen Web Solution
 	Text Domain:vertical-news-scroller
-	Version:1.31
+	Version:1.32
 	*/
+
+        
+        // ─── CONFIG — update these two values per release ──────────────────
+        define( 'VNS_NOTICE_VERSION', '1.32' ); // the version this notice is about
+        define( 'VNS_NOTICE_HEADLINE', 'Vertical News Scroller updated to v1.32' );
+        define( 'VNS_NOTICE_BODY', 'Now with RSS feed import, 4 visual styles, and a lightbox preview. See what\'s new in Pro:' );
+        define( 'VNS_NOTICE_PRO_URL', 'https://www.i13websolution.com/product/wordpress-vertical-news-scroller-pro/?utm_source=plugin_admin&utm_medium=whats_new_notice&utm_campaign=vns_' . str_replace( '.', '_', VNS_NOTICE_VERSION ) );
+        // ─────────────────────────────────────────────────────────────────
 
 	//add_action( 'admin_init', 'vertical_news_scroller_plugin_admin_init' );
 	register_activation_hook(__FILE__, 'vns_install_newsscroller');
@@ -1817,3 +1825,97 @@ function i13_vn_render_block_defaults($block_content, $block) {
 
 add_filter( 'render_block', 'i13_vn_render_block_defaults', 10, 2 );
 
+
+add_action( 'admin_notices', 'vns_render_whats_new_notice' );
+
+function vns_render_whats_new_notice() {
+
+	// Only show to admins/users who can actually act on it.
+	if ( ! current_user_can( 'manage_options' ) ) {
+		return;
+	}
+
+	$seen_version = get_option( 'vns_whats_new_seen_version', '' );
+
+	// Already dismissed this version's notice — nothing to do.
+	if ( $seen_version === VNS_NOTICE_VERSION ) {
+		return;
+	}
+
+	// Don't show on the plugin-update screen itself (avoid double noise
+	// right after clicking "Update Now").
+	$screen = get_current_screen();
+	if ( $screen && 'update-core' === $screen->id ) {
+		return;
+	}
+
+	$dismiss_url = wp_nonce_url(
+		add_query_arg( 'vns_dismiss_whats_new', VNS_NOTICE_VERSION ),
+		'vns_dismiss_whats_new_' . VNS_NOTICE_VERSION
+	);
+
+	?>
+	<div class="notice notice-info is-dismissible vns-whats-new-notice">
+		<p>
+			<strong><?php echo esc_html( VNS_NOTICE_HEADLINE ); ?></strong><br>
+			<?php echo esc_html( VNS_NOTICE_BODY ); ?>
+			<a href="<?php echo esc_url( VNS_NOTICE_PRO_URL ); ?>" target="_blank" rel="noopener">
+				See what's new in Pro &rarr;
+			</a>
+		</p>
+	</div>
+	<script>
+	// Persist dismissal when the user clicks WordPress's native dismiss (X).
+	jQuery( document ).on( 'click', '.vns-whats-new-notice .notice-dismiss', function () {
+		jQuery.post( ajaxurl, {
+			action: 'vns_dismiss_whats_new',
+			nonce: '<?php echo esc_js( wp_create_nonce( 'vns_dismiss_whats_new_ajax' ) ); ?>',
+			version: '<?php echo esc_js( VNS_NOTICE_VERSION ); ?>'
+		} );
+	} );
+	</script>
+	<?php
+}
+
+/**
+ * Handle dismissal via plain link (works even with JS disabled).
+ * Runs early so the redirect happens before any HTML is sent.
+ */
+add_action( 'admin_init', 'vns_handle_whats_new_dismiss_link' );
+function vns_handle_whats_new_dismiss_link() {
+	if ( ! isset( $_GET['vns_dismiss_whats_new'] ) ) {
+		return;
+	}
+
+	$version = sanitize_text_field( wp_unslash( $_GET['vns_dismiss_whats_new'] ) );
+
+	check_admin_referer( 'vns_dismiss_whats_new_' . $version );
+
+	if ( ! current_user_can( 'manage_options' ) ) {
+		return;
+	}
+
+	update_option( 'vns_whats_new_seen_version', $version );
+
+	// Redirect back to the same page, minus our query args, so reloading
+	// doesn't re-trigger the dismiss handler.
+	wp_safe_redirect( remove_query_arg( array( 'vns_dismiss_whats_new', '_wpnonce' ) ) );
+	exit;
+}
+
+/**
+ * Handle dismissal via the native WP "X" button (AJAX).
+ */
+add_action( 'wp_ajax_vns_dismiss_whats_new', 'vns_handle_whats_new_dismiss_ajax' );
+function vns_handle_whats_new_dismiss_ajax() {
+	check_ajax_referer( 'vns_dismiss_whats_new_ajax', 'nonce' );
+
+	if ( ! current_user_can( 'manage_options' ) ) {
+		wp_die();
+	}
+
+	$version = isset( $_POST['version'] ) ? sanitize_text_field( wp_unslash( $_POST['version'] ) ) : '';
+	update_option( 'vns_whats_new_seen_version', $version );
+
+	wp_die(); // AJAX handlers must die/exit.
+}

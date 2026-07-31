@@ -4,8 +4,8 @@ Tags:news ticker,scrolling news,news widget,vertical scroller,gutenberg block
 Donate link: http://www.i13websolution.com/donate_for_news_scroller.php
 Requires at least:3.0
 Tested up to:7.0
-Stable tag:1.31
-Version:1.31
+Stable tag:1.32
+Version:1.32
 License:GPLv2 or later
 License URI:http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -104,6 +104,11 @@ The Pro version adds unlimited news categories, automatic RSS feed integration (
 This plugin is free for everyone! Since it's released under the GPL, you can use it free of charge on your personal or commercial blog. But you can make some donations if you realy find it useful.
 
 == Changelog ==
+
+= 1.32 =
+
+* Added whats new in plugin.
+
 
 
 = 1.31 =
