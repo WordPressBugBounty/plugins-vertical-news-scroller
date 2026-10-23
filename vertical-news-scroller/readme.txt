@@ -3,7 +3,7 @@ Contributors:nik00726
 Tags:news ticker,scrolling news,news widget,vertical scroller,gutenberg block
 Donate link: http://www.i13websolution.com/donate_for_news_scroller.php
 Requires at least:3.0
-Tested up to:7.0
+Tested up to:7.1
 Stable tag:1.32
 Version:1.32
 License:GPLv2 or later
